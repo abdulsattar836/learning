@@ -6,19 +6,19 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const http = require("http"); // Import http module
 // swagger
-const basicAuth = require("express-basic-auth")
+const basicAuth = require("express-basic-auth");
 const swaggerUi = require("swagger-ui-express");
-const swaggerSpec = require("./utils/swaggerConfig")
-const {SwaggerTheme}= require("swagger-themes")
-const theme = new SwaggerTheme()
-const options ={
+const swaggerSpec = require("./utils/swaggerConfig");
+const { SwaggerTheme } = require("swagger-themes");
+const theme = new SwaggerTheme();
+const options = {
   explorer: true,
-  customCss: theme.getBuffer("dark")+".swagger-ui .topbar { display:none }"
-}
+  customCss: theme.getBuffer("dark") + ".swagger-ui .topbar { display:none }",
+};
 const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
 /* routes */
-// const adminRouter = require("./Route/admin_routes");
+const vendorRouter = require("./Route/vendor_routes");
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server
@@ -26,14 +26,13 @@ const server = http.createServer(app); // Create HTTP server
 app.use(
   "/api-docs",
   basicAuth({
-    users: { [process.env.SWAGGER_USERNAME]: process.env.SWAGGER_PASSWORD,
-    },
-    challenge:true,
-    realm:"Imb4T3st4pp"
+    users: { [process.env.SWAGGER_USERNAME]: process.env.SWAGGER_PASSWORD },
+    challenge: true,
+    realm: "Imb4T3st4pp",
   }),
   swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec,options)
-)
+  swaggerUi.setup(swaggerSpec, options)
+);
 
 app.enable("trust proxy");
 app.use(
@@ -42,7 +41,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 app.use(
   express.json({
@@ -73,7 +71,7 @@ app.use("/files", express.static(path.join(__dirname, "files"))); // Corrected p
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 /* routes */
-// app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/vendor", vendorRouter);
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./Controller/error_controller");
