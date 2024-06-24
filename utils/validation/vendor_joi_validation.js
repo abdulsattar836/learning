@@ -11,6 +11,15 @@ const signupVendorValidation = Joi.object({
   abortEarly: false,
 });
 
+// login vendor
+const loginVendorValidation = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+}).options({
+  abortEarly: false,
+});
+
 module.exports = {
   signupVendorValidation,
+  loginVendorValidation,
 };

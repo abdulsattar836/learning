@@ -76,7 +76,7 @@ app.use("/api/v1/vendor", vendorRouter);
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./Controller/error_controller");
 app.all("*", (req, res, next) => {
-  next(new AppError(`Cant find ${req.originalUrl} on this server`, 404));
+  next(new AppError(`Cant find ${req.originalUrl} on this server`, 400));
 });
 app.use(globalErrorHandler);
 
