@@ -1,4 +1,6 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
+
+const AppError = require("../../utils/appError");
 
 const htmlForOTP = `
 <!DOCTYPE html>
@@ -43,17 +45,16 @@ const htmlForOTP = `
     </div>
 </body>
 </html>
-`
+`;
 // Define the sendForgotOtp class
 class sendForgotOtp {
   constructor(email, resetcode) {
     this.to = email;
     this.resetcode = resetcode;
-    this.from = process.env.CLIENT_EMAIL;
 
     // Create a transporter object using the default SMTP transport
     this.transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: {
         user: process.env.SMTP_USER, // Your email address
         pass: process.env.SMTP_PASS, // Your email password
@@ -64,18 +65,17 @@ class sendForgotOtp {
   async send() {
     // Define the email options
     const mailOptions = {
-      from: this.from,
       to: this.to,
-      subject: ' verification code',
-      text: ' verification code',
-      html: htmlForOTP.replace('#code#', this.resetcode),
+      subject: " verification code",
+      text: " verification code",
+      html: htmlForOTP.replace("#code#", this.resetcode),
     };
 
     try {
       // Send the email
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      console.error('Error sending email:', error);
+      throw new Error("error send otp");
     }
   }
 

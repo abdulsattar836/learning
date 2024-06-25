@@ -1,12 +1,15 @@
 // define route
 const express = require("express");
 const ROUTE = express.Router();
-
+// model
+const vendor_model = require("../Model/vendor_model");
 // controller
 const {
   signUpVendor,
   loginVendor,
 } = require("../Controller/vendor_controller");
+const { logout } = require("../functions/user/user_functions");
+const { forgetPassword } = require("../functions/password/password_functions");
 
 // routes
 
@@ -77,5 +80,43 @@ ROUTE.route("/signup").post(signUpVendor);
  *         description: Login successfull
  */
 ROUTE.route("/login").post(loginVendor);
+
+/**
+ * @swagger
+ * /api/v1/vendor/logout:
+ *   post:
+ *     summary: Logout user
+ *     description: Invalidate the user's refresh token to log them out.
+ *     tags:
+ *       - Vendor/account
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       202:
+ *         description: Logout successfully
+ */
+ROUTE.route("/logout").post(logout(vendor_model));
+
+/**
+ * @swagger
+ * /api/v1/vendor/forgetPassword:
+ *   get:
+ *     summary: Send OTP for password reset
+ *     description: Generates a six-digit OTP and sends it to the user's email for password reset. The OTP is valid for 5 minutes.
+ *     tags:
+ *       - Vendor/account
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         description: The email address of the user who wants to reset their password.
+ *         schema:
+ *           type: string
+ *           example: "user@example.com"
+ *     responses:
+ *       202:
+ *         description: OTP sent successfully
+ */
+ROUTE.route("/forgetPassword").get(forgetPassword(vendor_model));
 
 module.exports = ROUTE;

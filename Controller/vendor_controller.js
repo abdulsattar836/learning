@@ -33,10 +33,10 @@ const signUpVendor = catchAsync(async (req, res, next) => {
     value.password,
     process.env.CRYPTO_SEC
   ).toString();
-  const venderExists = await vendor_model.findOne({
+  const vendorExists = await vendor_model.findOne({
     email: value.email,
   });
-  if (venderExists) {
+  if (vendorExists) {
     return next(new AppError("Vendor already exists", 400));
   }
   let newVendor = await vendor_model.create({
@@ -76,6 +76,7 @@ const loginVendor = catchAsync(async (req, res, next) => {
     vendorExists.password,
     process.env.CRYPTO_SEC
   );
+  //console.log(hashedPassword);
   const realPassword = hashedPassword.toString(CryptoJS.enc.Utf8);
   if (realPassword !== value.password) {
     return next(new AppError("Incorrect password", 400));
