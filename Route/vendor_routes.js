@@ -9,7 +9,8 @@ const {
   loginVendor,
 } = require("../Controller/vendor_controller");
 const { logout } = require("../functions/user/user_functions");
-const { forgetPassword } = require("../functions/password/password_functions");
+const { forgetPassword, setPassword } = require("../functions/password/password_functions");
+const { otpValidation } = require("../utils/verifyToken_util");
 
 // routes
 
@@ -118,5 +119,70 @@ ROUTE.route("/logout").post(logout(vendor_model));
  *         description: OTP sent successfully
  */
 ROUTE.route("/forgetPassword").get(forgetPassword(vendor_model));
+
+/**
+ * @swagger
+ *  /api/v1/vendor/otp-validation:
+ *   get:
+ *     summary: Validate OTP
+ *     description: Validate the provided OTP against the decrypted options.
+ *     tags:
+ *       - Vendor/account
+ *     parameters:
+ *       - in: query
+ *         name: otp
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The OTP entered by the user.
+ *       - in: query
+ *         name: encryptOpts
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The encrypted options containing the OTP and expiration time.
+ *     responses:
+ *       202:
+ *         description: Correct OTP
+ */
+ROUTE.route("/otp-validation").get(otpValidation);
+
+/**
+ * @swagger
+ * /api/v1/vendor/set-password:
+ *   post:
+ *     summary: Set a new password
+ *     description: Set a new password for the user after validating the OTP.
+ *     tags:
+ *       - Vendor/account
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - encryptOpts
+ *               - otp
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email address.
+ *               encryptOpts:
+ *                 type: string
+ *                 description: The encrypted options containing the OTP and expiration time.
+ *               otp:
+ *                 type: string
+ *                 description: The OTP entered by the user.
+ *               newPassword:
+ *                 type: string
+ *                 description: The new password to be set for the user.
+ *     responses:
+ *       202:
+ *         description: Password reset successfully.
+ */
+ROUTE.route("/set-password").post(setPassword(vendor_model));
 
 module.exports = ROUTE;

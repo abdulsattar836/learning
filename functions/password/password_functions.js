@@ -8,6 +8,10 @@ const catchAsync = require("../../utils/catchAsync");
 const sendForgotOtp = require("../../utils/email Sender/forgot_passwordEmail");
 // cryptoJs
 const CryptoJS = require("crypto-js");
+//validate password
+const {
+  validatePassword,
+} = require("../../utils/validation/validate password");
 
 // userPasswordCheck
 const userPasswordCheck = (user, password) => {
@@ -36,7 +40,7 @@ const forgetPassword = (model) =>
 
       const sixDigitNumber = generateSixDigitNumber();
       const expirationTime = new Date().getTime() + 5 * 60 * 1000; // 5 minutes expiration
-      await new sendForgotOtp( email , sixDigitNumber).sendVerificationCode();
+      await new sendForgotOtp(email, sixDigitNumber).sendVerificationCode();
       let otp = CryptoJS.AES.encrypt(
         JSON.stringify({
           code: sixDigitNumber,
@@ -55,12 +59,12 @@ const forgetPassword = (model) =>
     }
   });
 // setPassword
-const setPassword = async (req, res, next) => {
-  try {
+const setPassword = (model) =>
+  catchAsync(async (req, res, next) => {
     const { email, encryptOpts, otp, newPassword } = req.body;
     const check = validatePassword(newPassword);
     if (check.length > 0) {
-      return next(new AppError(check, StatusCodes.BAD_REQUEST));
+      return next(new AppError(check, 400));
     }
     const errors = [];
 
@@ -73,7 +77,7 @@ const setPassword = async (req, res, next) => {
     }
 
     if (errors.length > 0) {
-      return next(new AppError(errors, StatusCodes.BAD_REQUEST));
+      return next(new AppError(errors, 400));
     }
 
     // Decrypt the encrypted options and compare with the user-entered code
@@ -86,45 +90,32 @@ const setPassword = async (req, res, next) => {
     try {
       otpData = JSON.parse(decrypted);
     } catch (error) {
-      return next(
-        new AppError(
-          "Invalid encrypted options format.",
-          StatusCodes.BAD_REQUEST
-        )
-      );
+      return next(new AppError("Invalid encrypted options format.", 400));
     }
 
     const { code, expirationTime } = otpData;
 
     if (code != otp) {
-      return next(
-        new AppError("Invalid verification code.", StatusCodes.BAD_REQUEST)
-      );
+      return next(new AppError("Invalid verification code.", 400));
     }
 
     // Check if the OTP has expired
     const currentTime = new Date().getTime();
     if (currentTime > expirationTime) {
-      return next(
-        new AppError("Verification code has expired.", StatusCodes.BAD_REQUEST)
-      );
+      return next(new AppError("Verification code has expired.", 400));
     }
+
+    // console.log(model)
     // Find the user by email
     const user = await model.findOne({ email });
-
     if (!user) {
-      return next(new AppError("User not found.", StatusCodes.NOT_FOUND));
+      return next(new AppError("User not found.", 400));
     }
     if (!user.forgetPassword) {
-      return next(
-        new AppError(
-          "Unable to change password without OTP",
-          StatusCodes.NOT_FOUND
-        )
-      );
+      return next(new AppError("Unable to change password without OTP", 400));
     }
     if (encryptOpts != user.forgetPassword) {
-      new AppError("generate otp first", StatusCodes.NOT_FOUND);
+      new AppError("generate otp first", 400);
     }
     // Update the user's password
     user.password = CryptoJS.AES.encrypt(
@@ -133,18 +124,11 @@ const setPassword = async (req, res, next) => {
     ).toString();
     user.forgetPassword = null;
     await user.save();
-    return successMessage(
-      StatusCodes.ACCEPTED,
-      res,
-      "Password reset successfully.",
-      null
-    );
-  } catch (error) {
-    return next(new AppError(error, StatusCodes.INTERNAL_SERVER_ERROR));
-  }
-};
+    return successMessage(202, res, "Password reset successfully.", null);
+  });
 
 module.exports = {
   userPasswordCheck,
   forgetPassword,
+  setPassword,
 };
