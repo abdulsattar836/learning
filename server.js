@@ -19,6 +19,8 @@ const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
 /* routes */
 const vendorRouter = require("./Route/vendor_routes");
+const fileRouter = require("./Route/fileSystem_routes")
+const productRoutes=require("./Route/product_routes")
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server
@@ -72,6 +74,10 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 /* routes */
 app.use("/api/v1/vendor", vendorRouter);
+app.use("/api/v1/file", fileRouter);
+app.use("/api/v1/product", productRoutes);
+
+
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./Controller/error_controller");

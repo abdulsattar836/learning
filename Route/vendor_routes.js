@@ -9,7 +9,10 @@ const {
   loginVendor,
 } = require("../Controller/vendor_controller");
 const { logout } = require("../functions/user/user_functions");
-const { forgetPassword, setPassword } = require("../functions/password/password_functions");
+const {
+  forgetPassword,
+  setPassword,
+} = require("../functions/password/password_functions");
 const { otpValidation } = require("../utils/verifyToken_util");
 
 // routes

@@ -12,7 +12,7 @@ const getExtensionOfFile = (fileName) => {
 const deleteFile = async (path) => {
   const fs = require("fs");
   return new Promise((resolve) => {
-    fs.unlink("./files/" + path, (err) => {
+    fs.unlink("./" + path, (err) => {
       if (err) {
         console.log(`no file exist with ${path} location`);
       } else {
@@ -27,7 +27,7 @@ function fileExistsSync(fileName) {
   const fs = require("fs");
   const path = require("path");
   // Example usage
-  const folderPath = path.join(__dirname, "../../files");
+  const folderPath = path.join(__dirname, "../../");
   const filePath = path.join(folderPath, fileName);
   return fs.existsSync(filePath);
 }
