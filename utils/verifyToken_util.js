@@ -107,6 +107,7 @@ const refreshToken = (model) =>
       ...JSON.parse(JSON.stringify(user)),
     });
   });
+
 // otp validation
 const otpValidation = catchAsync(async (req, res, next) => {
   const { otp, encryptOpts } = req.query;

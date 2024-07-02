@@ -7,6 +7,7 @@ const vendor_model = require("../Model/vendor_model");
 const {
   createProduct,
   getProducts,
+  getProduct,
   deleteProduct,
   updateProduct,
 } = require("../Controller/product_controller");
@@ -81,6 +82,29 @@ ROUTE.route("/").post(verifyToken([vendor_model]), createProduct);
  */
 ROUTE.route("/").get(verifyToken([vendor_model]), getProducts);
 
+/**
+ * @swagger
+ * /api/v1/product/{id}:
+ *   get:
+ *     summary: Get product by ID
+ *     description: Retrieve a product by its ID.
+ *     tags:
+ *       - Vendor/Product
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product to retrieve.
+ *     responses:
+ *       202:
+ *         description: Successfully retrieved the product
+ */
+
+ROUTE.route("/:id").get(verifyToken([vendor_model]), getProduct);
 /**
  * @swagger
  * /api/v1/product/{id}:

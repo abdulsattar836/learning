@@ -2,29 +2,23 @@
 const express = require("express");
 const ROUTE = express.Router();
 // model
-const vendor_model = require("../Model/vendor_model");
+const admin_model = require("../Model/admin_model");
 // controller
-const {
-  signUpVendor,
-  loginVendor,
-} = require("../Controller/vendor_controller");
-const { logout } = require("../functions/user/user_functions");
+const { loginAdmin, logoutAdmin } = require("../Controller/admin_controllers");
 const {
   forgetPassword,
   setPassword,
 } = require("../functions/password/password_functions");
 const { otpValidation, refreshToken } = require("../utils/verifyToken_util");
 
-// routes
-
 /**
  * @swagger
- * /api/v1/vendor/signup:
+ * /api/v1/admin/login:
  *   post:
- *     summary: Signup a vendor
- *     description: Endpoint to register a new vendor.
+ *     summary: Admin login
+ *     description: This endpoint allows admins to log in.
  *     tags:
- *       - Vendor/account
+ *       - Admin/account
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -34,99 +28,57 @@ const { otpValidation, refreshToken } = require("../utils/verifyToken_util");
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
  *               email:
  *                 type: string
- *                 format: email
- *               companyName:
- *                 type: string
- *               phoneNumber:
- *                 type: string
+ *                 example: admin@example.com
  *               password:
  *                 type: string
- *     responses:
- *       '202':
- *         description: Signup success
- */
-ROUTE.route("/signup").post(signUpVendor);
-
-/**
- * @swagger
- * /api/v1/vendor/login:
- *   post:
- *     summary: Vendor login
- *     description: Endpoint for vendor login
- *     tags:
- *       - Vendor/account
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 description: Vendor's email address
- *                 example: vendor@example.com
- *               password:
- *                 type: string
- *                 description: Vendor's password
- *                 example: password123
+ *                 example: yourpassword
  *     responses:
  *       202:
- *         description: Login successfull
+ *         description: Successfully logged in
  */
-ROUTE.route("/login").post(loginVendor);
+ROUTE.route("/login").post(loginAdmin);
 
 /**
  * @swagger
- * /api/v1/vendor/logout:
+ * /api/v1/admin/logout:
  *   post:
- *     summary: Logout user
- *     description: Invalidate the user's refresh token to log them out.
+ *     summary: Admin logout
+ *     description: This endpoint allows admins to log out by invalidating their refresh token.
  *     tags:
- *       - Vendor/account
+ *       - Admin/account
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       202:
- *         description: Logout successfully
+ *         description: Successfully logged out
  */
-ROUTE.route("/logout").post(logout(vendor_model));
-
-
-
+ROUTE.route("/logout").post(logoutAdmin(admin_model));
 /**
  * @swagger
- * /api/v1/vendor/refreshtoken:
+ * /api/v1/admin/refreshtoken:
  *   post:
  *     summary: Refresh the access token
  *     description: This endpoint allows vendors to refresh their access token using a valid refresh token.
  *     tags:
- *       - Vendor/account
+ *       - Admin/account
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       202:
  *         description: Successfully refreshed the access token
  */
-ROUTE.route("/refreshtoken").post(refreshToken(vendor_model));
+ROUTE.route("/refreshtoken").post(refreshToken(admin_model));
 
 /**
  * @swagger
- * /api/v1/vendor/forgetPassword:
+ * /api/v1/admin/forgetPassword:
  *   get:
  *     summary: Send OTP for password reset
  *     description: Generates a six-digit OTP and sends it to the user's email for password reset. The OTP is valid for 5 minutes.
  *     tags:
- *       - Vendor/account
+ *       - Admin/account
  *     parameters:
  *       - in: query
  *         name: email
@@ -139,16 +91,16 @@ ROUTE.route("/refreshtoken").post(refreshToken(vendor_model));
  *       202:
  *         description: OTP sent successfully
  */
-ROUTE.route("/forgetPassword").get(forgetPassword(vendor_model));
+ROUTE.route("/forgetpassword").get(forgetPassword(admin_model));
 
 /**
  * @swagger
- *  /api/v1/vendor/otp-validation:
+ *  /api/v1/admin/otp-validation:
  *   get:
  *     summary: Validate OTP
  *     description: Validate the provided OTP against the decrypted options.
  *     tags:
- *       - Vendor/account
+ *       - Admin/account
  *     parameters:
  *       - in: query
  *         name: otp
@@ -170,12 +122,12 @@ ROUTE.route("/otp-validation").get(otpValidation);
 
 /**
  * @swagger
- * /api/v1/vendor/set-password:
+ * /api/v1/admin/set-password:
  *   post:
  *     summary: Set a new password
  *     description: Set a new password for the user after validating the OTP.
  *     tags:
- *       - Vendor/account
+ *       - Admin/account
  *     requestBody:
  *       required: true
  *       content:
@@ -204,6 +156,6 @@ ROUTE.route("/otp-validation").get(otpValidation);
  *       202:
  *         description: Password reset successfully.
  */
-ROUTE.route("/set-password").post(setPassword(vendor_model));
+ROUTE.route("/set-password").post(setPassword(admin_model));
 
 module.exports = ROUTE;

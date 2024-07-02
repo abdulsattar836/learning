@@ -18,7 +18,7 @@ const loginVendorValidation = Joi.object({
 }).options({
   abortEarly: false,
 });
-//create vendor
+
 
 
 

@@ -57,6 +57,23 @@ const getProducts = catchAsync(async (req, res, next) => {
   successMessage(202, res, "get all Product", products);
 });
 
+// method GET
+// route /api/v1/product/:id
+// @desciption for get product by id
+const getProduct = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await product_model.findById({
+    _id: id,
+    vendorId: req.user.id,
+  });
+
+  if (!product) {
+    return next(new AppError("No product found with that ID", 400));
+  }
+
+  successMessage(202, res, "Get Product successfully", { product });
+});
+
 // method DELETE
 // route /api/v1/product/:id
 // @desciption for delete product
@@ -102,10 +119,7 @@ const updateProduct = catchAsync(async (req, res, next) => {
     const ProductImageInDatabase = await product_model.findOne({
       ProductImage: value.ProductImage[0],
     });
-    if (
-      ProductImageInDatabase &&
-      !(req.user.id == ProductImageInDatabase.vendorId)
-    ) {
+    if (ProductImageInDatabase && !(id == ProductImageInDatabase._id)) {
       return next(new AppError("Product Image already exists", 400));
     }
   }
@@ -138,4 +152,5 @@ module.exports = {
   getProducts,
   deleteProduct,
   updateProduct,
+  getProduct,
 };
