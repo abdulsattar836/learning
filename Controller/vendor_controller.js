@@ -67,10 +67,13 @@ const loginVendor = catchAsync(async (req, res, next) => {
     return next(new AppError(errors, 400));
   }
   const vendorExists = await vendor_model.findOne({
-    email:value.email,
+    email: value.email,
   });
   if (!vendorExists) {
     return next(new AppError("Vendor not found", 400));
+  }
+  if (vendorExists.isBlock) {
+    return next(new AppError("Vendor is block", 400));
   }
   const hashedPassword = CryptoJS.AES.decrypt(
     vendorExists.password,
@@ -93,7 +96,7 @@ const loginVendor = catchAsync(async (req, res, next) => {
     accessToken,
     refreshToken,
   });
-}); 
+});
 
 module.exports = {
   signUpVendor,

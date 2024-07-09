@@ -2,6 +2,8 @@
 const AppError = require("../utils/appError");
 // model
 const admin_model = require("../Model/admin_model");
+const product_model = require("../Model/product_model");
+const vendor_model = require("../Model/vendor_model");
 // utility functions
 const { successMessage } = require("../functions/success/success_functions");
 // catchAsync
@@ -32,6 +34,7 @@ const loginAdmin = catchAsync(async (req, res, next) => {
   if (!admin) {
     return next(new AppError("not admin with this email", 400));
   }
+
   userPasswordCheck(admin, value.password);
   const {
     password: pass,
@@ -80,7 +83,69 @@ const logoutAdmin = (model) =>
 //   newPassword,
 //   process.env.CRYPTO_SEC
 // ).toString())
+
+// method GET
+// route /api/v1/Admin/logout
+// @desciption for Admin Dashboard
+const adminDashboard = catchAsync(async (req, res, next) => {
+  // Fetch all products
+  const products = await product_model.countDocuments();
+
+  // Fetch vendors based on the logged-in admin's vendorId
+  const vendors = await vendor_model.countDocuments();
+  const blockedvendors = await vendor_model.countDocuments({ isBlock: true });
+  // set value in  all vendors with specific conditions
+  // const result = await vendor_model.updateMany(
+  //   { isBlock: { $ne: true } },
+  //   { $set: { isBlock: false } }
+  // );
+
+  const unblockedvendors = await vendor_model.countDocuments({
+    isBlock: false,
+  });
+  // Log totals (optional)
+  // console.log(`Total Vendors: ${vendors}`);
+  // console.log(`Total blockedvendors: ${blockedvendors}`);
+  // console.log(`Total unblockedvendors: ${unblockedvendors}`);
+  // console.log(`Total Products: ${products}`);
+
+  // Return success response
+  return successMessage(202, res, "Dashboard", {
+    products,
+    vendors,
+    blockedvendors,
+    unblockedvendors,
+  });
+});
+
+// method GET
+// route /api/v1/admin/vendors
+// @desciption for Admin get all Vendors
+const getVendors = catchAsync(async (req, res, next) => {
+  // console.log(`Searching for vendors with vendorId: ${req.user.id}`);
+  const vendors = await vendor_model
+    .find({})
+    .select("-refreshToken -password -forgetPassword");
+  if (!vendors) {
+    return next(new AppError("No vendor found", 400));
+  }
+  successMessage(202, res, "get all Vendors", vendors);
+});
+
+const getallVendorswithoutToken = catchAsync(async (req, res, next) => {
+  // console.log(`Searching for vendors with vendorId: ${req.user.id}`);
+  const vendors = await vendor_model
+    .find({})
+    .select("-refreshToken -password -forgetPassword");
+  if (!vendors) {
+    return next(new AppError("No vendor found", 400));
+  }
+  successMessage(202, res, "get all Vendors", vendors);
+});
 module.exports = {
   loginAdmin,
   logoutAdmin,
+  adminDashboard,
+  getVendors,
+  getallVendorswithoutToken,
 };

@@ -28,6 +28,10 @@ const vendorSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    isBlock: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

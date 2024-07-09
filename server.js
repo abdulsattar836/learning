@@ -22,10 +22,12 @@ const vendorRouter = require("./Route/vendor_routes");
 const fileRouter = require("./Route/fileSystem_routes");
 const productRoutes = require("./Route/product_routes");
 const adminRouter = require("./Route/admin_routes");
-
+const blockedandunblockRoute = require("./Route/blockedandunblockedvendor_routes");
+const WithoutToken = require("./Route/WithoutToken_file");
+const WithoutTokenProduct = require("./Route/WithoutTokenProduct_routes");
 
 const app = express();
-const server = http.createServer(app); // Create HTTP server
+const server = http.createServer(app);
 
 app.use(
   "/api-docs",
@@ -79,13 +81,16 @@ app.use("/api/v1/vendor", vendorRouter);
 app.use("/api/v1/file", fileRouter);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/admin", adminRouter);
-
+app.use("/api/v1/blockandunblock", blockedandunblockRoute);
+app.use("/api/v1/WithoutToken", WithoutToken);
+app.use("/api/v1/WithoutTokenProduct", WithoutTokenProduct);
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./Controller/error_controller");
 app.all("*", (req, res, next) => {
   next(new AppError(`Cant find ${req.originalUrl} on this server`, 400));
 });
+
 app.use(globalErrorHandler);
 
 app.use((err, req, res, next) => {
@@ -93,11 +98,11 @@ app.use((err, req, res, next) => {
 });
 
 const DB = process.env.mongo_uri;
-const port = 3000;
+const port = 8000;
 
 const connectDB = async () => {
   try {
-    console.log("DB Connecting ...");
+    // console.log("DB Connecting ...");
     const response = await mongoose.connect(DB);
     if (response) {
       console.log("MongoDB connect successfully");

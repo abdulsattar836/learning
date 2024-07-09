@@ -1,29 +1,22 @@
 // define route
 const express = require("express");
 const ROUTE = express.Router();
-// model
-const vendor_model = require("../Model/vendor_model");
 // controller
 const {
-  uploadFile,
-} = require("../Controller/fileSystem_controller");
+  uploadFileWithoutToken,
+} = require("../Controller/WithoutToken_controller");
 // multer
 const upload = require("../multer/multer");
 // authorization
-const { verifyToken } = require("../utils/verifyToken_util");
-
-// routes
+// const { verifyToken } = require("../utils/verifyToken_util");
 
 /**
  * @swagger
- * /api/v1/file/:
+ * /api/v1/WithoutToken/uploadfile:
  *   post:
- *     summary: Upload a file
- *     description: Endpoint for vendors to upload a file.
+ *     summary: Upload a file without a token
  *     tags:
- *       - file/upload
- *     security:
- *       - bearerAuth: []
+ *       - WithoutToken/upload
  *     requestBody:
  *       required: true
  *       content:
@@ -36,10 +29,9 @@ const { verifyToken } = require("../utils/verifyToken_util");
  *                 format: binary
  *     responses:
  *       202:
- *         description: Successfully uploaded file
+ *         description: Successfully uploaded the file
  */
-ROUTE.route("/").post(verifyToken([vendor_model]), upload, uploadFile);
 
-
+ROUTE.route("/uploadfile").post(upload, uploadFileWithoutToken);
 
 module.exports = ROUTE;

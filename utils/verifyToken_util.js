@@ -52,9 +52,6 @@ const verifyToken = (model) => async (req, res, next) => {
     if (user.isBlock) {
       return next(new AppError("you are block", 401));
     }
-    if (user.isDeleted) {
-      return next(new AppError("user not found", 401));
-    }
     //console.log(user)
     const payloadunique = [];
     // Create an array of promises to verify each token

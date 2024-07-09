@@ -14,7 +14,7 @@ const {
 // auth
 const { verifyToken } = require("../utils/verifyToken_util");
 // multer
-const upload  = require("../multer/multer");
+const upload = require("../multer/multer");
 
 /**
  * @swagger
@@ -69,7 +69,7 @@ ROUTE.route("/").post(verifyToken([vendor_model]), createProduct);
  * @swagger
  * /api/v1/product/:
  *   get:
- *     summary: Retrieve all products
+ *     summary: Get all products
  *     description: Retrieve all products from the database
  *     tags:
  *       - Vendor/Product
@@ -109,7 +109,7 @@ ROUTE.route("/:id").get(verifyToken([vendor_model]), getProduct);
  * @swagger
  * /api/v1/product/{id}:
  *   delete:
- *     summary: Delete a product
+ *     summary: Delete a product by ID
  *     description: Delete a product by its ID. The product must belong to the authenticated vendor.
  *     tags:
  *       - Vendor/Product
@@ -183,10 +183,6 @@ ROUTE.route("/:id").delete(verifyToken([vendor_model]), deleteProduct);
  *         description: Product updated
  */
 
-ROUTE.route("/:id").put(
-  verifyToken([vendor_model]),
-  upload,
-  updateProduct,
-);
+ROUTE.route("/:id").put(verifyToken([vendor_model]), upload, updateProduct);
 
 module.exports = ROUTE;

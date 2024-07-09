@@ -89,7 +89,7 @@ ROUTE.route("/login").post(loginVendor);
  * @swagger
  * /api/v1/vendor/logout:
  *   post:
- *     summary: Logout user
+ *     summary: Vendor Logout 
  *     description: Invalidate the user's refresh token to log them out.
  *     tags:
  *       - Vendor/account

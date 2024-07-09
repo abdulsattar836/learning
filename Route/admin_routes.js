@@ -4,12 +4,22 @@ const ROUTE = express.Router();
 // model
 const admin_model = require("../Model/admin_model");
 // controller
-const { loginAdmin, logoutAdmin } = require("../Controller/admin_controllers");
+const {
+  loginAdmin,
+  logoutAdmin,
+  adminDashboard,
+  getVendors,
+  getallVendorswithoutToken,
+} = require("../Controller/admin_controllers");
 const {
   forgetPassword,
   setPassword,
 } = require("../functions/password/password_functions");
-const { otpValidation, refreshToken } = require("../utils/verifyToken_util");
+const {
+  otpValidation,
+  refreshToken,
+  verifyToken,
+} = require("../utils/verifyToken_util");
 
 /**
  * @swagger
@@ -158,4 +168,46 @@ ROUTE.route("/otp-validation").get(otpValidation);
  */
 ROUTE.route("/set-password").post(setPassword(admin_model));
 
+/**
+ * @swagger
+ * /api/v1/Admin/DashBoard:
+ *   get:
+ *     summary: Admin Dashboard
+ *     tags:
+ *       - Admin/Dashboard
+ *     description: Endpoint to retrieve Admin Dashboard data.
+ *     responses:
+ *       202:
+ *         description: Data retrieved successfully.
+ */
+ROUTE.route("/DashBoard").get(adminDashboard);
+
+/**
+ * @swagger
+ * /api/v1/admin/vendors:
+ *   get:
+ *     summary: Get all vendors for the logged-in admin
+ *     tags:
+ *       - Admin/Get Vendor
+ *     security:
+ *       - bearerAuth: []
+ *     description: Retrieves a list of vendors associated with the logged-in admin.
+ *     responses:
+ *       202:
+ *         description: A list of vendors was successfully retrieved.
+ */
+ROUTE.route("/vendors").get(verifyToken([admin_model]), getVendors);
+
+/**
+ * @swagger
+ * /api/v1/admin/:
+ *   get:
+ *     summary: Retrieve a list of vendors
+ *     tags:
+ *       - Admin/Get allVendor
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of vendors
+ */
+ROUTE.route("/WOToken").get(getallVendorswithoutToken);
 module.exports = ROUTE;
