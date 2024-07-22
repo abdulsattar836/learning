@@ -5,9 +5,9 @@ const options = {
   swaggerDefinition: {
     openapi: "3.0.0",
     info: {
-      title: "learning API",
+      title: "BALIZAAR",
       version: "1.0.0",
-      description: "API documentation for learning",
+      description: "API documentation for balizaar",
     },
     components: {
       securitySchemes: {

@@ -47,6 +47,7 @@ const htmlForOTP = `
 </html>
 `;
 // Define the sendForgotOtp class
+
 class sendForgotOtp {
   constructor(email, resetcode) {
     this.to = email;
@@ -83,6 +84,6 @@ class sendForgotOtp {
     await this.send();
   }
 }
-
 // Export the sendForgotOtp class
-module.exports = sendForgotOtp;
+module.exports = sendForgotOtp
+

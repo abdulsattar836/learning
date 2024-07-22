@@ -18,19 +18,12 @@ const options = {
 const dotenv = require("dotenv");
 dotenv.config({ path: ".env" });
 /* routes */
-const vendorRouter = require("./Route/vendor_routes");
-const fileRouter = require("./Route/fileSystem_routes");
-const productRoutes = require("./Route/product_routes");
-const adminRouter = require("./Route/admin_routes");
-const blockedandunblockRoute = require("./Route/blockedandunblockedvendor_routes");
-const WithoutToken = require("./Route/WithoutToken_file");
-const WithoutTokenProduct = require("./Route/WithoutTokenProduct_routes");
-
+const userRouter = require("./Route/user_routes");
 const app = express();
 const server = http.createServer(app);
 
 app.use(
-  "/api-docs",
+  "/api-dcos",
   basicAuth({
     users: { [process.env.SWAGGER_USERNAME]: process.env.SWAGGER_PASSWORD },
     challenge: true,
@@ -77,13 +70,7 @@ app.use("/files", express.static(path.join(__dirname, "files"))); // Corrected p
 app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 
 /* routes */
-app.use("/api/v1/vendor", vendorRouter);
-app.use("/api/v1/file", fileRouter);
-app.use("/api/v1/product", productRoutes);
-app.use("/api/v1/admin", adminRouter);
-app.use("/api/v1/blockandunblock", blockedandunblockRoute);
-app.use("/api/v1/WithoutToken", WithoutToken);
-app.use("/api/v1/WithoutTokenProduct", WithoutTokenProduct);
+app.use("/api/v1/user", userRouter);
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./Controller/error_controller");

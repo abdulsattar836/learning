@@ -107,7 +107,7 @@ const refreshToken = (model) =>
 
 // otp validation
 const otpValidation = catchAsync(async (req, res, next) => {
-  const { otp, encryptOpts } = req.query;
+  const { otp } = req.query;
   // Decrypt the encrypted options and compare with the user-entered code
   const decrypted = CryptoJS.AES.decrypt(
     decodeURIComponent(encryptOpts),

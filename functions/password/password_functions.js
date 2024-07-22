@@ -59,73 +59,122 @@ const forgetPassword = (model) =>
     }
   });
 // setPassword
+// const setPassword = (model) =>
+//   catchAsync(async (req, res, next) => {
+//     const { email, encryptOpts, otp, newPassword } = req.body;
+//     const check = validatePassword(newPassword);
+//     if (check.length > 0) {
+//       return next(new AppError(check, 400));
+//     }
+//     const errors = [];
+
+//     if (!email) {
+//       errors.push("Email is required.");
+//     }
+
+//     if (!otp) {
+//       errors.push("Verification code is required.");
+//     }
+
+//     if (errors.length > 0) {
+//       return next(new AppError(errors, 400));
+//     }
+
+//     // Decrypt the encrypted options and compare with the user-entered code
+//     const decrypted = CryptoJS.AES.decrypt(
+//       decodeURIComponent(encryptOpts),
+//       process.env.CRYPTO_SEC
+//     ).toString(CryptoJS.enc.Utf8);
+
+//     let otpData;
+//     try {
+//       otpData = JSON.parse(decrypted);
+//     } catch (error) {
+//       return next(new AppError("Invalid encrypted options format.", 400));
+//     }
+
+//     const { code, expirationTime } = otpData;
+
+//     if (code != otp) {
+//       return next(new AppError("Invalid verification code.", 400));
+//     }
+
+//     // Check if the OTP has expired
+//     const currentTime = new Date().getTime();
+//     if (currentTime > expirationTime) {
+//       return next(new AppError("Verification code has expired.", 400));
+//     }
+
+//     // console.log(model)
+//     // Find the user by email
+//     const user = await model.findOne({ email });
+//     if (!user) {
+//       return next(new AppError("User not found.", 400));
+//     }
+//     if (!user.forgetPassword) {
+//       return next(new AppError("Unable to change password without OTP", 400));
+//     }
+//     if (encryptOpts != user.forgetPassword) {
+//       new AppError("generate otp first", 400);
+//     }
+//     // Update the user's password
+//     user.password = CryptoJS.AES.encrypt(
+//       newPassword,
+//       process.env.CRYPTO_SEC
+//     ).toString();
+//     user.forgetPassword = null;
+//     await user.save();
+//     return successMessage(202, res, "Password reset successfully.", null);
+//   });
+
 const setPassword = (model) =>
   catchAsync(async (req, res, next) => {
-    const { email, encryptOpts, otp, newPassword } = req.body;
+    const { email, currentPassword, newPassword } =
+      req.body;
     const check = validatePassword(newPassword);
+
     if (check.length > 0) {
       return next(new AppError(check, 400));
     }
+
     const errors = [];
 
     if (!email) {
       errors.push("Email is required.");
     }
 
-    if (!otp) {
-      errors.push("Verification code is required.");
-    }
+  
 
     if (errors.length > 0) {
       return next(new AppError(errors, 400));
     }
 
-    // Decrypt the encrypted options and compare with the user-entered code
-    const decrypted = CryptoJS.AES.decrypt(
-      decodeURIComponent(encryptOpts),
+    // Find the user (assuming user information is available in req.user)
+        const user = await model.findOne({ email });
+        if (!user) {
+          return next(new AppError("User not found.", 400));
+        }
+
+    // Check old password
+    const decryptedcurrentPassword = CryptoJS.AES.decrypt(
+      user.password,
       process.env.CRYPTO_SEC
     ).toString(CryptoJS.enc.Utf8);
 
-    let otpData;
-    try {
-      otpData = JSON.parse(decrypted);
-    } catch (error) {
-      return next(new AppError("Invalid encrypted options format.", 400));
+    if (decryptedcurrentPassword !== currentPassword) {
+      return next(new AppError(" currentPassword is incorrect.", 400));
     }
 
-    const { code, expirationTime } = otpData;
-
-    if (code != otp) {
-      return next(new AppError("Invalid verification code.", 400));
-    }
-
-    // Check if the OTP has expired
-    const currentTime = new Date().getTime();
-    if (currentTime > expirationTime) {
-      return next(new AppError("Verification code has expired.", 400));
-    }
-
-    // console.log(model)
-    // Find the user by email
-    const user = await model.findOne({ email });
-    if (!user) {
-      return next(new AppError("User not found.", 400));
-    }
-    if (!user.forgetPassword) {
-      return next(new AppError("Unable to change password without OTP", 400));
-    }
-    if (encryptOpts != user.forgetPassword) {
-      new AppError("generate otp first", 400);
-    }
     // Update the user's password
     user.password = CryptoJS.AES.encrypt(
       newPassword,
       process.env.CRYPTO_SEC
     ).toString();
-    user.forgetPassword = null;
     await user.save();
+
     return successMessage(202, res, "Password reset successfully.", null);
   });
+
 
 module.exports = {
   userPasswordCheck,
